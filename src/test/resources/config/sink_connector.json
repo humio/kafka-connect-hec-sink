@@ -1,0 +1,18 @@
+{
+  "name": "e2e-test-humio-hec-sink",
+  "config": {
+    "connector.class": "com.humio.connect.hec.HECSinkConnector",
+    "topics": "e2e-test-topic",
+    "key.converter":"io.confluent.connect.avro.AvroConverter",
+    "key.converter.schema.registry.url":"http://_SCHEMA_REG_HOST_:_SCHEMA_REG_PORT_",
+    "value.converter":"io.confluent.connect.avro.AvroConverter",
+    "value.converter.schema.registry.url":"http://_SCHEMA_REG_HOST_:_SCHEMA_REG_PORT_",
+    "humio.hec.url": "_HEC_ENDPOINT_",
+    "humio.repo": "sandbox",
+    "humio.hec.ingest_token": "_INGEST_TOKEN_",
+    "humio.hec.buffer_size": 50,
+    "humio.hec.fields.topic": "#kafka_topic",
+    "humio.hec.fields.partition": "kafka_partition",
+    "humio.hec.fields.use_kafka_timestamp": true
+  }
+}
