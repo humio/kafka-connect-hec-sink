@@ -61,7 +61,7 @@ Property | Description
 `humio.hec.fields.topic` | When set, defines the name of the field which will automatically be set to hold the kafka topic name the event originated from.  It may be useful to use a tag, e.g., `#httpd`.  This configuration element must be a non-empty string and is _optional_.
 `humio.hec.fields.partition` | When set, defines the name of the field which will automatically be set to the partition of the kafka topic the event originated from.  This configuration element must be a non-empty string and is _optional_.
 `humio.hec.fields.use_kafka_timestamp` |  When `true`, will automatically set the `time` field of every event sent to the HEC endpoint to the kafka message time value.  This configuration element must be one of `true` or `false` and is _optional_.
-`humio.hec.retry.max` | Maximum number of times a call to the HEC endpoint will be retried before failing (and throwing an exception).  Default value is 10 retries.
+`humio.hec.retry.max` | Maximum number of times a call to the HEC endpoint will be retried before failing (and throwing an exception).  This configuration element is _optional_, with a default value of 10 retries.
 `humio.hec.retry.delay_sec` | Related to `humio.hec.retry.max`, retries use an exponential backoff strategy with an initial delay of `humio.hec.retry.delay_sec` seconds and is _optional_.  Default value is 10 seconds.
 
 ## Data & Schema
