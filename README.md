@@ -85,7 +85,7 @@ Converter | Description
 --------- | -----------
 `org.apache.kafka.connect.storage.StringConverter` | With `StringConverter`, messages are placed in the HEC event as a raw string.  If messages on your kafka topic are, e.g., JSON, you should use `JsonConverter`, otherwise you will lose any structured data in your events.
 `org.apache.kafka.connect.json.JsonConverter` | With `JsonConverter`, messages are placed in the HEC event as the given JSON object without modification.
-`io.confluent.connect.avro.AvroConverter` | With `AvroConverter`, messages are converted to JSON and placed in the HEC event.  Currently the connector handles `SinkRecord` records (i.e., Structs) with support for the following types: `INT8`, `INT16`, `INT32`, `INT64`, `FLOAT32`, `FLOAT64`, `BOOLEAN`, `STRING`, `ARRAY`, `MAP`, & `STRUCT`, with full support for nested value structures.  `BYTES` is _not_ currently supported.
+`io.confluent.connect.avro.AvroConverter` | With `AvroConverter`, messages are converted to JSON and placed in the HEC event.  Currently the connector handles `SinkRecord` records (i.e., Structs) with support for the following types: `INT8`, `INT16`, `INT32`, `INT64`, `FLOAT32`, `FLOAT64`, `BOOLEAN`, `STRING`, `ARRAY`, `MAP`, & `STRUCT`, with full support for nested value structures.  `BYTES` is _not_ currently supported.  We also _do not_ currently support maps with non-string keys.
 
 ## Metrics
 
