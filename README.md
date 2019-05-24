@@ -46,6 +46,10 @@ cp target/kafka-connect-hec-sink-1.0-SNAPSHOT-jar-with-dependencies.jar /CONFLUE
 
 See the [Install Connectors](https://docs.confluent.io/current/connect/managing/install.html) Confluent page for more information.
 
+### Creating a Confluent Hub archive
+
+This connector utilizes the `kafka-connect-maven-plugin` maven plugin to create a Confluent Hub compatible archive.  Use `mvn package` to create the archive `target/components/packages/humio-kafka-connect-hec-sink-1.0-SNAPSHOT.zip`.
+
 ## Configuration
 
 For an example configuration using standalone mode, refer to `config/HECSinkConnector.properties`, and for distributed mode, refer to `src/test/resources/config/json_sink_connector.json`.
