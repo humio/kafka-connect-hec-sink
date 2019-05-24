@@ -1,3 +1,9 @@
+/*
+    Copyright (c) Humio, 2019
+    See file "LICENSE.md" for terms of usage and
+    redistribution.
+*/
+
 package com.humio.connect.hec;
 
 import java.io.File;
@@ -16,7 +22,6 @@ public class TestUtils {
                 if (!success) { return false; }
             }
         }
-        // either file or an empty directory
         System.out.println("removing file or directory : " + dir.getName());
         return dir.delete();
     }

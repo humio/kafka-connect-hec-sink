@@ -1,3 +1,9 @@
+/*
+    Copyright (c) Humio, 2019
+    See file "LICENSE.md" for terms of usage and
+    redistribution.
+*/
+
 package com.humio.connect.hec.converter;
 
 import com.google.gson.JsonObject;
@@ -8,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class JsonRawStringRecordConverterTest {
-
     @Test
     void convert() {
         JsonRawStringRecordConverter converter = new JsonRawStringRecordConverter();
@@ -19,6 +24,4 @@ class JsonRawStringRecordConverterTest {
 
         assertEquals("value", obj.get("test").getAsString());
     }
-
-    // TODO: exercise all json field types
 }
