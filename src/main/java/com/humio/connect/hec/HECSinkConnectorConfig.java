@@ -44,7 +44,7 @@ public class HECSinkConnectorConfig extends AbstractConfig {
     public static final String PARTITION_FIELD_DOC = "When set, this events field will be set to the partition of the topic the message was received from.";
 
     public HECSinkConnectorConfig(ConfigDef config, Map<String, String> parsedConfig) {
-    super(config, parsedConfig);
+        super(config, parsedConfig);
     }
 
     public HECSinkConnectorConfig(Map<String, String> parsedConfig) {

@@ -91,6 +91,8 @@ Converter | Description
 `org.apache.kafka.connect.json.JsonConverter` | With `JsonConverter`, messages are placed in the HEC event as the given JSON object without modification.
 `io.confluent.connect.avro.AvroConverter` | With `AvroConverter`, messages are converted to JSON and placed in the HEC event.  Currently the connector handles `SinkRecord` records (i.e., Structs) with support for the following types: `INT8`, `INT16`, `INT32`, `INT64`, `FLOAT32`, `FLOAT64`, `BOOLEAN`, `STRING`, `ARRAY`, `MAP`, & `STRUCT`, with full support for nested value structures.  `BYTES` is _not_ currently supported.  We also _do not_ currently support maps with non-string keys.
 
+__NOTE__: Regarding schema evolution, because this connector converts any given Avro message to JSON on-the-fly (within the constraints of the Avro data types given above) for submission to the Humio HEC endpoint, schema evolution is not an issue, and there are no restrictions other than being limited to the aforementioned supported Avro data types.
+
 ## Metrics
 
 Metrics are exposed via JMX as well as dumped to standard out every 30 seconds.
