@@ -67,6 +67,10 @@ Property | Description
 `humio.hec.fields.use_kafka_timestamp` |  When `true`, will automatically set the `time` field of every event sent to the HEC endpoint to the kafka message time value.  This configuration element must be one of `true` or `false` and is _optional_.
 `humio.hec.retry.max` | Maximum number of times a call to the HEC endpoint will be retried before failing (and throwing an exception).  This configuration element is _optional_, with a default value of 10 retries.
 `humio.hec.retry.delay_sec` | Related to `humio.hec.retry.max`, retries use an exponential backoff strategy with an initial delay of `humio.hec.retry.delay_sec` seconds and is _optional_.  Default value is 10 seconds.
+`humio.hec.ignore_parsing_errors` | When `true`, ignore parsing errors during operation as a result of transforming the message into a Humio HEC message.  If a message cannot be parsed, it will be skipped.  Topic name, partition id, and kafka offset are logged (DEBUG level).  Also see metric `com.humio.connect.hec.HECSinkTask.parsing-errors`.  Default value is `false`.  NOTE: you may be more interested in the Kafka Connect configuration option `errors.tolerance`, see link below.
+`humio.hec.log_parsing_errors` | When `true`, log parsing errors (INFO level) as a result of transforming the message into a Humio HEC message.  Topic name, partition id, kafka offset, & native Kafka Connect `sinkRecord` and `sinkRecord.value` (as strings) are logged.  Also see metric `com.humio.connect.hec.HECSinkTask.parsing-errors`.  Default value is `true`.  NOTE: you may be more interested in the Kafka Connect configuration option `errors.log.enable` & `errors.log.include.messages`, see link below.
+
+NOTE: There are many more potentially useful Kafka Connect worker configuration options, see [here](https://docs.confluent.io/current/connect/references/allconfigs.html), with further information on handling errors (parsing and otherwise) [here](https://www.confluent.io/blog/kafka-connect-deep-dive-error-handling-dead-letter-queues).
 
 ## Data & Schema
 
@@ -87,7 +91,7 @@ These determine the method by which the HEC Sink handles each message and are de
 
 Converter | Description
 --------- | -----------
-`org.apache.kafka.connect.storage.StringConverter` | With `StringConverter`, messages are placed in the HEC event as a raw string.  If messages on your kafka topic are, e.g., JSON, you should use `JsonConverter`, otherwise you will lose any structured data in your events.
+`org.apache.kafka.connect.storage.StringConverter` | With `StringConverter`, messages are placed in the HEC event as a raw string if JSON parsing fails.  If all messages on your kafka topic(s) are JSON, you should use `JsonConverter`, as it will be more efficient.
 `org.apache.kafka.connect.json.JsonConverter` | With `JsonConverter`, messages are placed in the HEC event as the given JSON object without modification.
 `io.confluent.connect.avro.AvroConverter` | With `AvroConverter`, messages are converted to JSON and placed in the HEC event.  Currently the connector handles `SinkRecord` records (i.e., Structs) with support for the following types: `INT8`, `INT16`, `INT32`, `INT64`, `FLOAT32`, `FLOAT64`, `BOOLEAN`, `STRING`, `ARRAY`, `MAP`, & `STRUCT`, with full support for nested value structures.  `BYTES` is _not_ currently supported.  We also _do not_ currently support maps with non-string keys.
 
@@ -105,6 +109,7 @@ Name | Description
 ---- | -----------
 `com.humio.connect.hec.HECSinkTask.active-tasks` | Number of active sink tasks.
 `com.humio.connect.hec.HECSinkTask.flushes` | Number of flushes requested by Connect.
+`com.humio.connect.hec.HECSinkTask.parsing-errors` | Number of parsing errors.  NOTE: these parse errors are in coercing the sink records into Humio HEC records, not during initial Kafka ingest.  See notes regarding parsing errors & logging in the configuration section above.
 `com.humio.connect.hec.HECSinkTask.put-records` | Number of records put.
 `com.humio.connect.hec.HECSinkTask.task-starts` | Number of connector task starts.
 `com.humio.connect.hec.HECSinkTask.task-stops` | Number of connector task stops.

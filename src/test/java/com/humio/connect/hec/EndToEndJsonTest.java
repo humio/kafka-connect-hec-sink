@@ -117,11 +117,11 @@ public class EndToEndJsonTest {
     @BeforeAll
     public static void setup() throws IOException, InterruptedException {
 
-        log.info("removing any existing humio-data volume...");
+        System.out.println("removing any existing humio-data volume...");
 
         if (manageDocker) {
             removeExistingHumioData();
-            log.info("starting container...");
+            System.out.println("starting container...");
             CONTAINER_ENV.start();
         }
 
@@ -135,7 +135,7 @@ public class EndToEndJsonTest {
         PRODUCER = new KafkaProducer<>(props);
 
         if (manageDocker) {
-            log.info("waiting for containers...");
+            System.out.println("waiting for containers...");
             Thread.sleep(30000);
         }
 
@@ -146,7 +146,7 @@ public class EndToEndJsonTest {
         int tries = 0;
         while(true) {
             try {
-                log.info("reading humio admin token...");
+                System.out.println("reading humio admin token...");
                 HUMIO_INGEST_TOKEN = getIngestToken();
                 dockerRunning = true;
                 break;
@@ -155,11 +155,11 @@ public class EndToEndJsonTest {
                 if (tries == 4) {
                     throw new RuntimeException("docker container failed to start.");
                 }
-                log.info("waiting for docker to come online...");
+                System.out.println("waiting for docker to come online...");
                 Thread.sleep(5000);
             }
         }
-        log.info("humio ingest token: " + HUMIO_INGEST_TOKEN);
+        System.out.println("humio ingest token: " + HUMIO_INGEST_TOKEN);
 
         // sink config: replacement variables -> docker values + token
         String config = new String(Files.readAllBytes(Paths.get(SINK_CONNECTOR_CONFIG)));
@@ -169,22 +169,24 @@ public class EndToEndJsonTest {
                 .replaceAll("_INGEST_TOKEN_", HUMIO_INGEST_TOKEN);
 
         // register connector
-        log.info("registering sink connector...");
+        System.out.println("registering sink connector...");
         registerHumioHECSinkConnector(config);
 
-        log.info("waiting for connector...");
+        System.out.println("waiting for connector...");
         Thread.sleep(10000);
 
-        log.info("test setup complete");
+        System.out.println("test setup complete");
     }
 
     @Test
     void endToEndTest() throws IOException, InterruptedException {
-        log.info("starting integration test...");
+        System.out.println("starting integration test...");
         assert(dockerRunning);
 
         String uuid = UUID.randomUUID().toString();
 
+        // NOTE: there will be numTestRecords*2 records created, one for JSON-formatted messages and one for
+        //  raw string messages for each of numTestRecords; this is to test the JsonRawStringRecordConverter.
         int numTestRecords = 10;
         for (int tid = 0; tid < numTestRecords; tid++) {
             JsonObject rec = new JsonObject();
@@ -193,29 +195,41 @@ public class EndToEndJsonTest {
                     "uuid is " + uuid + " and hello " + tid + "! testing kafka is fun :D");
             ProducerRecord<String, String> record = new ProducerRecord<>(KAFKA_TOPIC, rec.toString());
 
-            System.out.println(LocalDateTime.now() + " producer sending -> " + record);
+            System.out.println(LocalDateTime.now() + " (JSON) producer sending -> " + record);
 
             PRODUCER.send(record, (RecordMetadata r, Exception exc) -> {
-                assertNull(exc, () -> "unexpected error while sending: " + rec
+                assertNull(exc, () -> "unexpected error while sending JSON record: " + rec
+                        + " | exc: " + exc.getMessage()
+                );
+            });
+
+            ProducerRecord<String, String> rawStringRecord = new ProducerRecord<>(
+                    KAFKA_TOPIC,
+                    "raw string record #" + tid + ": " + System.currentTimeMillis());
+
+            System.out.println(LocalDateTime.now() + " (raw string) producer sending -> " + rawStringRecord);
+
+            PRODUCER.send(rawStringRecord, (RecordMetadata r, Exception exc) -> {
+                assertNull(exc, () -> "unexpected error while sending rawStringRecord: " + rec
                         + " | exc: " + exc.getMessage()
                 );
             });
         }
-        log.info("flushing producer...");
+        System.out.println("flushing producer...");
         PRODUCER.flush();
 
-        log.info("waiting for connector processing...");
+        System.out.println("waiting for connector processing...");
         Thread.sleep(10000);
 
-        log.info("querying for " + numTestRecords + " records...");
+        System.out.println("querying for " + (numTestRecords*2) + " records...");
 
-        log.info("count query...");
+        System.out.println("count query...");
         List<JsonObject> results = queryHumio("count()");
         String countResult = results.get(0).get("_count").getAsString();
-        assertEquals("10", ""+numTestRecords);
+        assertEquals("20", countResult);
 
-        log.info("uuid check...");
-        results = queryHumio("");
+        System.out.println("uuid check...");
+        results = queryHumio(uuid);
         assertEquals(10, results.size());
         for(JsonObject res : results) {
             String msg = res.get("message").getAsString();
@@ -227,15 +241,15 @@ public class EndToEndJsonTest {
 
     @AfterAll
     public static void teardown() {
-        log.info("stopping kafka producer...");
+        System.out.println("stopping kafka producer...");
         PRODUCER.close();
 
         if (manageDocker) {
-            log.info("stopping container...");
+            System.out.println("stopping container...");
             CONTAINER_ENV.stop();
         }
 
-        log.info("test complete.");
+        System.out.println("test complete.");
     }
 
     // utils
@@ -273,7 +287,7 @@ public class EndToEndJsonTest {
     }
 
     private static String getIngestToken() throws IOException {
-        log.info("extracting " + HUMIO_INDEX + " ingest key from global data snapshot...");
+        System.out.println("extracting " + HUMIO_INDEX + " ingest key from global data snapshot...");
         String s = new String(Files.readAllBytes(Paths.get("humio-data/global-data-snapshot.json")));
         JsonObject data = new JsonParser().parse(s).getAsJsonObject();
         JsonObject dataspaces = data.getAsJsonObject("dataspaces");
@@ -282,7 +296,7 @@ public class EndToEndJsonTest {
             String key = entry.getKey();
             JsonObject obj = entry.getValue().getAsJsonObject();
             if (key.startsWith(HUMIO_INDEX) && key.indexOf("LocalHostRoot") == -1) {
-                log.info("located " + HUMIO_INDEX + " key: " + key);
+                System.out.println("located " + HUMIO_INDEX + " key: " + key);
                 JsonObject sandbox = dataspaces.getAsJsonObject(key);
                 JsonObject entity = sandbox.getAsJsonObject("entity");
                 JsonArray tokens = entity.getAsJsonArray("ingestTokens");
@@ -303,15 +317,15 @@ public class EndToEndJsonTest {
                 .post(body)
                 .build();
 
-        log.info("sending -> " + configuration);
+        System.out.println("sending -> " + configuration);
         Response response = new OkHttpClient().newCall(request).execute();
-        log.info("response code = " + response.code());
-        log.info("response body = " + response.body().string());
+        System.out.println("response code = " + response.code());
+        System.out.println("response body = " + response.body().string());
 
         // if it already exists, let's update it as configuration may have changed between runs
         if (response.code() == 409) {
             response.close();
-            log.info("connector already exists, updating configuration...");
+            System.out.println("connector already exists, updating configuration...");
 
             JsonObject config = new JsonParser().parse(configuration).getAsJsonObject();
             String connectorName = config.get("name").getAsString();

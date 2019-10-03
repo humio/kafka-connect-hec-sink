@@ -5,7 +5,7 @@
     "topics": "e2e-test-topic",
     "key.converter":"org.apache.kafka.connect.storage.StringConverter",
     "key.converter.schemas.enable": false,
-    "value.converter":"org.apache.kafka.connect.json.JsonConverter",
+    "value.converter":"org.apache.kafka.connect.storage.StringConverter",
     "value.converter.schemas.enable": false,
     "humio.hec.url": "_HEC_ENDPOINT_",
     "humio.repo": "sandbox",
@@ -13,6 +13,11 @@
     "humio.hec.buffer_size": 50,
     "humio.hec.fields.topic": "#kafka_topic",
     "humio.hec.fields.partition": "kafka_partition",
-    "humio.hec.fields.use_kafka_timestamp": true
+    "humio.hec.fields.use_kafka_timestamp": true,
+    "humio.hec.log_parsing_errors": true,
+    "humio.hec.ignore_parsing_errors": true,
+    "errors.tolerance": "none",
+    "errors.log.enable": true,
+    "errors.log.include.messages": true
   }
 }

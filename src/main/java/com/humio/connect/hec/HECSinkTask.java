@@ -37,6 +37,7 @@ public class HECSinkTask extends SinkTask {
     private static final Logger log = LogManager.getLogger(HECSinkTask.class);
 
     private HECService hecService;
+    private HECSinkConnectorConfig hecConfig;
 
     private static final AtomicLong instanceCounter = new AtomicLong(0);
     private long inst = -1;
@@ -63,6 +64,8 @@ public class HECSinkTask extends SinkTask {
             Metrics.metrics.histogram(name(this.getClass(), "put-batch-sizes"));
     private final Timer putCalls =
             Metrics.metrics.timer(name(this.getClass(), "put-calls"));
+    private final Counter parsingErrors =
+            Metrics.metrics.counter(name(this.getClass(), "parsing-errors"));
 
     @Override
     public String version() {
@@ -72,6 +75,7 @@ public class HECSinkTask extends SinkTask {
     @Override
     public void start(Map<String, String> config) {
         inst = instanceCounter.incrementAndGet();
+        hecConfig = new HECSinkConnectorConfig(config);
         log.debug("hec: starting instance " + inst);
         hecService = new HECServiceImpl(null, new HECSinkConnectorConfig(config));
         taskStarts.inc();
@@ -89,19 +93,42 @@ public class HECSinkTask extends SinkTask {
             Collection<Record> records = collection
                     .stream()
                     .map(r -> {
-                        Object data = r.value();
-                        Schema schema = r.valueSchema();
-                        if (schema != null && data instanceof Struct) {
-                            return structConverter.convert(r);
-                        } else if (data instanceof Map) {
-                            return jsonConverter.convert(r);
-                        } else if (data instanceof String) {
-                            return stringConverter.convert(r);
-                        } else {
-                            throw new DataException("error: no converter present due to unexpected object type "
-                                    + data.getClass().getName());
+                        try {
+                            Object data = r.value();
+                            Schema schema = r.valueSchema();
+                            if (schema != null && data instanceof Struct) {
+                                return structConverter.convert(r);
+                            } else if (data instanceof Map) {
+                                return jsonConverter.convert(r);
+                            } else if (data instanceof String) {
+                                return stringConverter.convert(r);
+                            } else {
+                                throw new DataException("error: no converter present due to unexpected object type "
+                                        + data.getClass().getName());
+                            }
+                        } catch (Exception ex) {
+                            parsingErrors.inc();
+                            if (hecConfig.logParsingErrors()) {
+                                System.out.println("Unable to parse message: " +
+                                        "topic = " + r.topic() +
+                                        ", partition = " + r.kafkaPartition() +
+                                        ", offset = " + r.kafkaOffset() +
+                                        "\n\nrecord.toString = " + r.toString() +
+                                        "\n\nrecord.value = " + r.value() + "\n\n");
+                            }
+                            if (!hecConfig.ignoreParsingErrors()) {
+                                System.out.println("Ignored parsing error, " +
+                                        "topic = " + r.topic() +
+                                        ", partition = " + r.kafkaPartition() +
+                                        ", offset = " + r.kafkaOffset());
+                                return null;
+                            } else {
+                                throw new DataException(ex);
+                            }
                         }
-                    }).collect(Collectors.toList());
+                    })
+                    .filter(r -> r != null)
+                    .collect(Collectors.toList());
             hecService.process(records);
             putRecords.inc(records.size());
             putBatchSizes.update(records.size());

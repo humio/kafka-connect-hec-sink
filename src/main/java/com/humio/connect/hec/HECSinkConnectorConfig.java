@@ -43,6 +43,12 @@ public class HECSinkConnectorConfig extends AbstractConfig {
     public static final String PARTITION_FIELD = "humio.hec.fields.partition";
     public static final String PARTITION_FIELD_DOC = "When set, this events field will be set to the partition of the topic the message was received from.";
 
+    public static final String IGNORE_PARSING_ERRORS = "humio.hec.ignore_parsing_errors";
+    public static final String IGNORE_PARSING_ERRORS_DOC = "When set, this will ignore messages which fail parsing (default false).  Use with humio.hec.log_parsing_errors for debug information.";
+
+    public static final String LOG_PARSING_ERRORS = "humio.hec.log_parsing_errors";
+    public static final String LOG_PARSING_ERRORS_DOC = "When set, this will log messages which failed to parse (default true).";
+
     public HECSinkConnectorConfig(ConfigDef config, Map<String, String> parsedConfig) {
         super(config, parsedConfig);
     }
@@ -76,7 +82,11 @@ public class HECSinkConnectorConfig extends AbstractConfig {
         .define(TOPIC_FIELD, Type.STRING, null,
                 Importance.HIGH, TOPIC_FIELD_DOC)
         .define(PARTITION_FIELD, Type.STRING, null,
-                Importance.HIGH, PARTITION_FIELD_DOC);
+                Importance.HIGH, PARTITION_FIELD_DOC)
+        .define(IGNORE_PARSING_ERRORS, Type.BOOLEAN, false,
+                Importance.HIGH, IGNORE_PARSING_ERRORS_DOC)
+        .define(LOG_PARSING_ERRORS, Type.BOOLEAN, true,
+                Importance.HIGH, LOG_PARSING_ERRORS_DOC);
     }
 
     public String getIndexName(){
@@ -98,5 +108,9 @@ public class HECSinkConnectorConfig extends AbstractConfig {
     public String getTopicField() { return this.getString(TOPIC_FIELD); }
 
     public String getPartitionField() { return this.getString(PARTITION_FIELD); }
+
+    public boolean ignoreParsingErrors() { return this.ignoreParsingErrors(); }
+
+    public boolean logParsingErrors() { return this.logParsingErrors(); }
 
 }

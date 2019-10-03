@@ -67,7 +67,7 @@ public class JsonDataPump {
 
         if (args.length > 0) {
             KAFKA_TOPIC = args[0];
-            log.info("set kafka topic to '" + KAFKA_TOPIC + "'");
+            System.out.println("set kafka topic to '" + KAFKA_TOPIC + "'");
         }
 
         Properties props = new Properties();
@@ -96,7 +96,7 @@ public class JsonDataPump {
             ct++;
             if (ct % batchSize == 0) {
                 long dif = System.currentTimeMillis() - t0;
-                log.info((dif) + "ms per " + batchSize + " messages (" + ct + " sent)");
+                System.out.println((dif) + "ms per " + batchSize + " messages (" + ct + " sent)");
                 t0 = System.currentTimeMillis();
             }
         }
