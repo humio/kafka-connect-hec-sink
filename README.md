@@ -64,6 +64,9 @@ Property | Description
 `humio.hec.buffer_size` | Maximum number of events to send per call the HEC endpoint.  This configuration element must be an integer greater than zero and is __required__.
 `humio.hec.fields.topic` | When set, defines the name of the field which will automatically be set to hold the kafka topic name the event originated from.  It may be useful to use a tag, e.g., `#httpd`.  This configuration element must be a non-empty string and is _optional_.
 `humio.hec.fields.partition` | When set, defines the name of the field which will automatically be set to the partition of the kafka topic the event originated from.  This configuration element must be a non-empty string and is _optional_.
+`humio.hec.fields.kafka_offset` | When set, this events field will be set to the kafka offset for the partition of the topic the message was received from. This configuration element must be a non-empty string and is _optional_.
+`humio.hec.fields.message_key` | When set, this events field will be set to the key of the kafka message, if one exists.  Only string values are currently supported.  This configuration element must be a non-empty string and is _optional_.
+`humio.hec.fields.message_headers` | When set, this events field will be set to the headers of the kafka message, if any exist.  Kafka message headers consist of a key and a value, and keys may repeat.  In event that a key appears only once, it will be expressed as a field with the name `<humio.hec.fields.message_headers>.<header-key>`.  If a particular key appears more than once in a set of headers, it will be expressed as a field with the name `<humio.hec.fields.message_headers>.<header-key>[n]`, where _n_ is the ordinal position of the key as they are iterated, beginning at zero.  Only string-to-string mappings are currently supported.  This configuration element must be a non-empty string and is _optional_.
 `humio.hec.fields.use_kafka_timestamp` |  When `true`, will automatically set the `time` field of every event sent to the HEC endpoint to the kafka message time value.  This configuration element must be one of `true` or `false` and is _optional_.
 `humio.hec.retry.max` | Maximum number of times a call to the HEC endpoint will be retried before failing (and throwing an exception).  This configuration element is _optional_, with a default value of 10 retries.
 `humio.hec.retry.delay_sec` | Related to `humio.hec.retry.max`, retries use an exponential backoff strategy with an initial delay of `humio.hec.retry.delay_sec` seconds and is _optional_.  Default value is 10 seconds.
@@ -76,7 +79,7 @@ NOTE: There are many more potentially useful Kafka Connect worker configuration 
 
 ### Keys & Values
 
-Kafka message _keys_ are currently ignored.  Values are converted to HEC-compatible JSON based on connector configuration (see below examples).
+Other than the action by setting the configuration option `humio.hec.fields.message_key`, Kafka message _keys_ are currently ignored.  Values are converted to HEC-compatible JSON based on connector configuration (see below examples).
 
 ### Schema Configuration
 
@@ -177,7 +180,7 @@ The _end-to-end test_ performs the following steps (assuming _managed_ docker):
 * starts the Docker containers described in `src/test/resources/docker-compose.yml` and waits for them to successfully start;
 * extracts the Humio ingest token from the `humio-data` directory mounted from within the running docker container;
 * registers (or updates) the sink connector with Kafka Connect;
-* pushes 10 unique messages to the configured Kafka topic, flushes the Kafka producer, and waits for them to have been processed;
+* pushes 10 unique JSON-formatted messages and 10 raw string messages to the configured Kafka topic, flushes the Kafka producer, and waits for them to have been processed;
 * performs a `count()` query against the Humio docker instance, verifying the correct number of messages has been received;
 * performs a check to ensure a unique token placed in the messages is present in the output of each message;
 * shuts down the docker containers.
