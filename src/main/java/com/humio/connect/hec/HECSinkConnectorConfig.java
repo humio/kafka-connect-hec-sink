@@ -43,6 +43,15 @@ public class HECSinkConnectorConfig extends AbstractConfig {
     public static final String PARTITION_FIELD = "humio.hec.fields.partition";
     public static final String PARTITION_FIELD_DOC = "When set, this events field will be set to the partition of the topic the message was received from.";
 
+    public static final String KAFKA_OFFSET_FIELD = "humio.hec.fields.kafka_offset";
+    public static final String KAFKA_OFFSET_FIELD_DOC = "When set, this events field will be set to the kafka offset for the partition of the topic the message was received from.";
+
+    public static final String MESSAGE_KEY_FIELD = "humio.hec.fields.message_key";
+    public static final String MESSAGE_KEY_FIELD_DOC = "When set, this events field will be set to the key of the kafka message, if one exists.";
+
+    public static final String MESSAGE_HEADERS_FIELD = "humio.hec.fields.message_headers";
+    public static final String MESSAGE_HEADERS_FIELD_DOC = "When set, this events field will be set to the headers of the kafka message, if any exist.";
+
     public static final String IGNORE_PARSING_ERRORS = "humio.hec.ignore_parsing_errors";
     public static final String IGNORE_PARSING_ERRORS_DOC = "When set, this will ignore messages which fail parsing (default false).  Use with humio.hec.log_parsing_errors for debug information.";
 
@@ -83,6 +92,12 @@ public class HECSinkConnectorConfig extends AbstractConfig {
                 Importance.HIGH, TOPIC_FIELD_DOC)
         .define(PARTITION_FIELD, Type.STRING, null,
                 Importance.HIGH, PARTITION_FIELD_DOC)
+        .define(KAFKA_OFFSET_FIELD, Type.STRING, null,
+                Importance.HIGH, KAFKA_OFFSET_FIELD_DOC)
+        .define(MESSAGE_KEY_FIELD, Type.STRING, null,
+                Importance.HIGH, MESSAGE_KEY_FIELD_DOC)
+        .define(MESSAGE_HEADERS_FIELD, Type.STRING, null,
+                Importance.HIGH, MESSAGE_HEADERS_FIELD_DOC)
         .define(IGNORE_PARSING_ERRORS, Type.BOOLEAN, false,
                 Importance.HIGH, IGNORE_PARSING_ERRORS_DOC)
         .define(LOG_PARSING_ERRORS, Type.BOOLEAN, true,
@@ -108,6 +123,12 @@ public class HECSinkConnectorConfig extends AbstractConfig {
     public String getTopicField() { return this.getString(TOPIC_FIELD); }
 
     public String getPartitionField() { return this.getString(PARTITION_FIELD); }
+
+    public String getKafkaOffsetField() { return this.getString(KAFKA_OFFSET_FIELD); }
+
+    public String getMessageKeyField() { return this.getString(MESSAGE_KEY_FIELD); }
+
+    public String getMessageHeadersField() { return this.getString(MESSAGE_HEADERS_FIELD); }
 
     public boolean ignoreParsingErrors() { return this.ignoreParsingErrors(); }
 

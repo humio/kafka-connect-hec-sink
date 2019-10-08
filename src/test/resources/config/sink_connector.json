@@ -13,6 +13,9 @@
     "humio.hec.buffer_size": 50,
     "humio.hec.fields.topic": "#kafka_topic",
     "humio.hec.fields.partition": "kafka_partition",
-    "humio.hec.fields.use_kafka_timestamp": true
+    "humio.hec.fields.use_kafka_timestamp": true,
+    "humio.hec.fields.kafka_offset": "kafka_offset",
+    "humio.hec.fields.message_key": "message_key",
+    "humio.hec.fields.message_headers": "message_headers"
   }
 }

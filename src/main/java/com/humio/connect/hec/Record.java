@@ -7,6 +7,7 @@
 package com.humio.connect.hec;
 
 import com.google.gson.*;
+import org.apache.kafka.connect.sink.SinkRecord;
 
 public class Record {
     public final JsonElement value;
@@ -15,6 +16,9 @@ public class Record {
     public final String topic;
     public final int partition;
     public final long ts;
+    public final long kafkaOffset;
+
+    public final SinkRecord sinkRecord;
 
     private static Gson gson;
 
@@ -25,11 +29,13 @@ public class Record {
                 .create();
     }
 
-    public Record(JsonElement value, long ts, String topic, int partition) {
+    public Record(SinkRecord sinkRecord, JsonElement value) {
         this.value = value;
-        this.ts = ts / 1000;
-        this.topic = topic;
-        this.partition = partition;
+        this.ts = sinkRecord.timestamp() / 1000;
+        this.topic = sinkRecord.topic();
+        this.partition = sinkRecord.kafkaPartition();
+        this.kafkaOffset = sinkRecord.kafkaOffset();
+        this.sinkRecord = sinkRecord;
         message = new JsonObject();
     }
 

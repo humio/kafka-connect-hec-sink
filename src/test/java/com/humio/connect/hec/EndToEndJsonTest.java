@@ -12,11 +12,19 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import io.confluent.kafka.serializers.KafkaAvroSerializer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
+import org.apache.kafka.common.PartitionInfo;
+import org.apache.kafka.common.header.internals.RecordHeader;
+import org.apache.kafka.common.serialization.IntegerSerializer;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.apache.kafka.connect.data.Schema;
+import org.apache.kafka.connect.data.SchemaBuilder;
+import org.apache.kafka.connect.data.Struct;
+import org.apache.kafka.connect.header.Header;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.ClassRule;
@@ -188,12 +196,31 @@ public class EndToEndJsonTest {
         // NOTE: there will be numTestRecords*2 records created, one for JSON-formatted messages and one for
         //  raw string messages for each of numTestRecords; this is to test the JsonRawStringRecordConverter.
         int numTestRecords = 10;
+
+        // find our partition, just in case it's not what one might expect :)
+        int partition = 0;
+        for(PartitionInfo partitionInfo : PRODUCER.partitionsFor(KAFKA_TOPIC)) {
+            partition = partitionInfo.partition();
+            System.out.println("#### partition set to " + partition);
+            break;
+        }
+
         for (int tid = 0; tid < numTestRecords; tid++) {
             JsonObject rec = new JsonObject();
             rec.addProperty("num", tid);
             rec.addProperty("message",
                     "uuid is " + uuid + " and hello " + tid + "! testing kafka is fun :D");
-            ProducerRecord<String, String> record = new ProducerRecord<>(KAFKA_TOPIC, rec.toString());
+
+            ProducerRecord<String, String> record = new ProducerRecord(
+                    KAFKA_TOPIC,
+                    partition,
+                    "key-" + tid,
+                    rec.toString(),
+                    new ArrayList<Header>());
+            record.headers()
+                    .add("header-key-1", "header key one value".getBytes())
+                    .add("header-key-1", "header key one value 2".getBytes())
+                    .add("header-key-2", "header key two value".getBytes());
 
             System.out.println(LocalDateTime.now() + " (JSON) producer sending -> " + record);
 
@@ -203,9 +230,16 @@ public class EndToEndJsonTest {
                 );
             });
 
-            ProducerRecord<String, String> rawStringRecord = new ProducerRecord<>(
+            ProducerRecord<String, String> rawStringRecord = new ProducerRecord(
                     KAFKA_TOPIC,
-                    "raw string record #" + tid + ": " + System.currentTimeMillis());
+                    partition,
+                    "raw-key-" + tid,
+                    "raw string record #" + tid + ": " + System.currentTimeMillis(),
+                    new ArrayList<Header>());
+            rawStringRecord.headers()
+                    .add("raw-header-key-1", "header key one value".getBytes())
+                    .add("raw-header-key-1", "header key one value 2".getBytes())
+                    .add("raw-header-key-2", "header key two value".getBytes());
 
             System.out.println(LocalDateTime.now() + " (raw string) producer sending -> " + rawStringRecord);
 
@@ -215,20 +249,20 @@ public class EndToEndJsonTest {
                 );
             });
         }
-        System.out.println("flushing producer...");
+        System.out.println("\n\nflushing producer...");
         PRODUCER.flush();
 
-        System.out.println("waiting for connector processing...");
+        System.out.println("\n\nwaiting for connector processing...");
         Thread.sleep(10000);
 
-        System.out.println("querying for " + (numTestRecords*2) + " records...");
+        System.out.println("\n\nquerying for " + (numTestRecords*2) + " records...");
 
-        System.out.println("count query...");
+        System.out.println("\n\ncount query...");
         List<JsonObject> results = queryHumio("count()");
         String countResult = results.get(0).get("_count").getAsString();
         assertEquals("20", countResult);
 
-        System.out.println("uuid check...");
+        System.out.println("\n\nuuid check...");
         results = queryHumio(uuid);
         assertEquals(10, results.size());
         for(JsonObject res : results) {

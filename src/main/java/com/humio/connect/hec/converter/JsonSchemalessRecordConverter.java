@@ -36,6 +36,6 @@ public class JsonSchemalessRecordConverter implements RecordConverter {
                 payload,
                 JsonElement.class);
 
-        return new Record(el, record.timestamp(), record.topic(), record.kafkaPartition());
+        return new Record(record, el);
     }
 }

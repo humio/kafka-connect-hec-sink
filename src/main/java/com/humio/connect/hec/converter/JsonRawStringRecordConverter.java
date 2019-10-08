@@ -26,6 +26,6 @@ public class JsonRawStringRecordConverter implements RecordConverter {
             el = new JsonPrimitive((String) record.value());
         }
 
-        return new Record(el, record.timestamp(), record.topic(), record.kafkaPartition());
+        return new Record(record, el);
     }
 }

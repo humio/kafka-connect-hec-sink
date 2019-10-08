@@ -27,14 +27,14 @@ public class AvroConverter implements RecordConverter {
     @Override
     public Record convert(SinkRecord record) {
         JsonObject el = toJsonObject(record);
-        return new Record(el, record.timestamp(), record.topic(), record.kafkaPartition());
+        return new Record(record, el);
     }
 
     private JsonObject toJsonObject(SinkRecord record) {
         return toJsonObject(record.valueSchema(), record.value());
     }
 
-    private JsonObject toJsonObject(Schema schema, Object value) {
+    public JsonObject toJsonObject(Schema schema, Object value) {
         JsonObject obj = new JsonObject();
         schema.fields().forEach(f -> processField(obj, (Struct) value, f));
         return obj;
