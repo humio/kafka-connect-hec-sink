@@ -109,8 +109,8 @@ public class HECSinkConnectorConfig extends AbstractConfig {
 
     public String getPartitionField() { return this.getString(PARTITION_FIELD); }
 
-    public boolean ignoreParsingErrors() { return this.ignoreParsingErrors(); }
+    public boolean ignoreParsingErrors() { return this.getBoolean(IGNORE_PARSING_ERRORS); }
 
-    public boolean logParsingErrors() { return this.logParsingErrors(); }
+    public boolean logParsingErrors() { return this.getBoolean(LOG_PARSING_ERRORS); }
 
 }

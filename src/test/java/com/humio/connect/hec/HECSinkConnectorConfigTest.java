@@ -85,4 +85,16 @@ class HECSinkConnectorConfigTest {
         HECSinkConnectorConfig config = new HECSinkConnectorConfig(props);
         Assert.assertEquals(config.getString(HECSinkConnectorConfig.PARTITION_FIELD), null);
     }
+
+    @Test
+    public void testIgnoreParsingErrorsOption() {
+        HECSinkConnectorConfig config = new HECSinkConnectorConfig(props);
+        Assert.assertEquals(false, config.ignoreParsingErrors());
+    }
+
+    @Test
+    public void testLogParsingErrorsOption() {
+        HECSinkConnectorConfig config = new HECSinkConnectorConfig(props);
+        Assert.assertEquals(true, config.logParsingErrors());
+    }
 }
