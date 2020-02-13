@@ -7,6 +7,7 @@
 package com.humio.connect.hec.converter;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.humio.connect.hec.Record;
 import org.apache.kafka.connect.data.Field;
@@ -73,7 +74,9 @@ public class AvroConverter implements RecordConverter {
     private void handlePrimitiveField(JsonObject obj, Struct struct, Field field) {
         final String fieldName = field.name();
         final Object val = struct.get(field);
-        if (val instanceof Number) {
+        if (val == null) {
+            obj.add(fieldName, JsonNull.INSTANCE);
+        } else if (val instanceof Number) {
             obj.addProperty(fieldName, (Number) val);
         } else if (val instanceof String) {
             obj.addProperty(fieldName, (String) val);
