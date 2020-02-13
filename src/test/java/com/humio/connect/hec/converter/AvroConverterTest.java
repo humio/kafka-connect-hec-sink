@@ -20,6 +20,7 @@ import java.util.Collections;
 import static com.humio.connect.hec.converter.ConverterTestUtils.makeSinkRecord;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AvroConverterTest {
     private AvroConverter converter = new AvroConverter();
@@ -33,6 +34,7 @@ class AvroConverterTest {
                 .field("month", Schema.STRING_SCHEMA)
                 .field("day", Schema.INT8_SCHEMA)
                 .field("year", Schema.INT16_SCHEMA)
+                .field("nullable_field", Schema.OPTIONAL_STRING_SCHEMA)
                 .build();
 
         Struct struct = new Struct(valueSchema)
@@ -47,7 +49,8 @@ class AvroConverterTest {
         assertAll(
                 () -> assertEquals("january", obj.get("month").getAsString()),
                 () -> assertEquals(8, obj.get("day").getAsByte()),
-                () -> assertEquals(1977, obj.get("year").getAsShort())
+                () -> assertEquals(1977, obj.get("year").getAsShort()),
+                () -> assertTrue(obj.get("nullable_field").isJsonNull())
         );
     }
 
