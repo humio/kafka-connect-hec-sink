@@ -1,10 +1,30 @@
 # Humio HEC Kafka Connector
 
-## Introduction
+## Vision
 
 This guide provides step-by-step guidance on how to build, integrate and operate the Humio HEC connector within the Kafka platform.
 
 The purpose of the Humio HEC Sink connector is to read messages from a Kafka topic and submit them as events to the [HTTP event collector endpoint](https://docs.humio.com/integrations/data-shippers/hec/) of a running Humio system.
+
+## Governance
+This project is maintained by employees at Humio ApS.
+As a general rule, only employees at Humio can become maintainers and have commit privileges to this repository.
+Therefore, if you want to contribute to the project, which we very much encourage, you must first fork the repository.
+Maintainers will have the final say on accepting or rejecting pull requests.
+As a rule of thumb, pull requests will be accepted if:
+ 
+   * The contribution fits with the project's vision
+   * All automated tests have passed
+   * The contribution is of a quality comparable to the rest of the project
+ 
+The maintainers will attempt to react to issues and pull requests quickly, but their ability to do so can vary.
+If you haven't heard back from a maintainer within 7 days of creating an issue or making a pull request, please feel free to ping them on the relevant post.
+
+Maintainers will also be in charge of both versioning and publishing future releases of the project. This includes adding versioning tags and adding to the changelog file.
+ 
+The active maintainers involved with this project include:
+  
+   * [John Muellerleile](https://github.com/jrecursive/)
 
 ## Resources
 
