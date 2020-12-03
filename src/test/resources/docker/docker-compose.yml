@@ -2,15 +2,13 @@
 version: '2'
 services:
   humio:
-    image: humio/humio:1.5.8
+    image: humio/humio:1.18.0
     hostname: humio
     depends_on:
       - zookeeper
       - kafkabroker
     ports:
       - "27017:27017"
-    volumes:
-      - ../../../../humio-data:/data/humio-data
     environment:
       HUMIO_PORT: 27017
       KAFKA_SERVERS: "kafkabroker:19092"
