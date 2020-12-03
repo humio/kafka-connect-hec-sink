@@ -256,7 +256,7 @@ public class EndToEndJsonTest {
     private static List<JsonObject> queryHumio(String query) throws IOException {
         JsonObject q = new JsonObject();
         q.addProperty("queryString", query);
-        q.addProperty("start", "30s");
+        q.addProperty("start", "5m");
         q.addProperty("end", "now");
         q.addProperty("isLive", false);
         return queryHumio(q);
