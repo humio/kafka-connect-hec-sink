@@ -298,23 +298,24 @@ public class EndToEndJsonTest {
                 .post(body)
                 .build();
 
-        Response response = new OkHttpClient().newCall(request).execute();
-        String responseBody = Objects.requireNonNull(response.body()).string();
-        JsonObject data = new JsonParser().parse(responseBody).getAsJsonObject();
+        try (Response response = new OkHttpClient().newCall(request).execute()) {
+            String responseBody = Objects.requireNonNull(response.body()).string();
+            JsonObject data = new JsonParser().parse(responseBody).getAsJsonObject();
 
-        for (JsonElement element : data.getAsJsonObject("data").getAsJsonArray("repositories")) {
-            JsonObject obj = element.getAsJsonObject();
-            if (obj.get("name").getAsString().startsWith(HUMIO_INDEX)) {
-                return obj
-                        .getAsJsonArray("ingestTokens")
-                        .get(0)
-                        .getAsJsonObject()
-                        .get("token")
-                        .getAsString();
+            for (JsonElement element : data.getAsJsonObject("data").getAsJsonArray("repositories")) {
+                JsonObject obj = element.getAsJsonObject();
+                if (obj.get("name").getAsString().startsWith(HUMIO_INDEX)) {
+                    return obj
+                            .getAsJsonArray("ingestTokens")
+                            .get(0)
+                            .getAsJsonObject()
+                            .get("token")
+                            .getAsString();
+                }
             }
-        }
 
-        throw new RuntimeException("cannot extract " + HUMIO_INDEX + " ingest token via graphql");
+            throw new RuntimeException("cannot extract " + HUMIO_INDEX + " ingest token via graphql");
+        }
     }
 
     private static void registerHumioHECSinkConnector(String configuration) throws IOException {
