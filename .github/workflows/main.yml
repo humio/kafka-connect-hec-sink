@@ -18,8 +18,14 @@ jobs:
         path: ~/.m2
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
         restore-keys: ${{ runner.os }}-m2
-    - name: Build with Maven
-      run: mvn -B package --file pom.xml
+    - uses: satackey/action-docker-layer-caching@v0.0.8
+      continue-on-error: true
+    - name: Build
+      run: mvn -DskipTests=true assembly:assembly -DdescriptorId=jar-with-dependencies
+    - name: Run tests
+      run: mvn test
+    - name: Create package
+      run: mvn package -DskipTests=true
     - uses: actions/upload-artifact@v2
       with:
         path: target/components/packages/*.zip
