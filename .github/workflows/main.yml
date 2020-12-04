@@ -26,6 +26,17 @@ jobs:
       run: mvn test
     - name: Create package
       run: mvn package -DskipTests=true
+    - name: Get version
+      run:
+        VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout) &&
+        echo "VERSION=$VERSION" >> $GITHUB_ENV
     - uses: actions/upload-artifact@v2
       with:
-        path: target/components/packages/*.zip
+        name: humio-kafka-connect-hec-sink-confluenthub-${{ env.VERSION }}
+        path: target/components/packages/humio-kafka-connect-hec-sink-${{ env.VERSION }}/**
+    - uses: actions/upload-artifact@v2
+      with:
+        name: humio-kafka-connect-hec-sink-jar-${{ env.VERSION }}
+        path: target/kafka-connect-hec-sink-${{ env.VERSION }}-jar-with-dependencies.jar
+
+
