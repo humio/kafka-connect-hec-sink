@@ -1,0 +1,44 @@
+name: CI
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-java@v1
+      with:
+        java-version: '9.0.4'
+        java-package: jdk
+        architecture: x64
+    - name: Cache Maven packages
+      uses: actions/cache@v2
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+    - uses: satackey/action-docker-layer-caching@v0.0.8
+      continue-on-error: true
+    - name: Build
+      run: mvn -DskipTests=true assembly:assembly -DdescriptorId=jar-with-dependencies
+    - name: Run tests
+      run: mvn test
+    - name: Create package
+      run: mvn package -DskipTests=true
+    - name: Get version
+      run:
+        VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout) &&
+        echo "VERSION=$VERSION" >> $GITHUB_ENV
+    - uses: actions/upload-artifact@v2
+      with:
+        name: humio-kafka-connect-hec-sink-confluenthub-${{ env.VERSION }}
+        path: target/components/packages/humio-kafka-connect-hec-sink-${{ env.VERSION }}/**
+    - uses: actions/upload-artifact@v2
+      with:
+        name: humio-kafka-connect-hec-sink-jar-${{ env.VERSION }}
+        path: target/kafka-connect-hec-sink-${{ env.VERSION }}-jar-with-dependencies.jar
+
+
