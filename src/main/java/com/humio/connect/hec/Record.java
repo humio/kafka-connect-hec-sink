@@ -16,14 +16,10 @@ public class Record {
     public final int partition;
     public final long ts;
 
-    private static Gson gson;
-
-    static {
-        gson = new GsonBuilder()
-                .setFieldNamingPolicy(FieldNamingPolicy.IDENTITY)
-                .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")
-                .create();
-    }
+    private static final Gson gson = new GsonBuilder()
+            .setFieldNamingPolicy(FieldNamingPolicy.IDENTITY)
+            .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")
+            .create();
 
     public Record(JsonElement value, long ts, String topic, int partition) {
         this.value = value;

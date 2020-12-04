@@ -42,6 +42,7 @@
         <mvn.failsafe.plugin.version>2.22.1</mvn.failsafe.plugin.version>
         <jackson.version>2.9.8</jackson.version>
         <confluent.interceptors.version>5.2.1</confluent.interceptors.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <repositories>
@@ -203,6 +204,7 @@
         <plugins>
             <plugin>
                 <artifactId>maven-shade-plugin</artifactId>
+                <version>3.2.1</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -233,6 +235,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
+                <version>3.1.1</version>
                 <configuration>
                     <archive>
                         <manifest>
@@ -320,6 +323,24 @@
                 <version>${codacy.plugin.version}</version>
             </plugin>
             <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <phase>generate-test-sources</phase>
+                        <goals>
+                            <goal>add-test-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.basedir}/target/generated-test-sources/java</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.avro</groupId>
                 <artifactId>avro-maven-plugin</artifactId>
                 <version>${avro.version}</version>
@@ -334,7 +355,7 @@
                         </goals>
                         <configuration>
                             <sourceDirectory>src/test/resources/avro/</sourceDirectory>
-                            <outputDirectory>${project.basedir}/src/test/java/</outputDirectory>
+                            <outputDirectory>${project.basedir}/target/generated-test-sources/java/</outputDirectory>
                             <fieldVisibility>PRIVATE</fieldVisibility>
                             <includes>
                                 <include>**/*.avsc</include>

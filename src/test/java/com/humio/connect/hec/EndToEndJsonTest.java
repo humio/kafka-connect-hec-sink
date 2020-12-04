@@ -75,9 +75,8 @@ public class EndToEndJsonTest {
     private static KafkaProducer<String, String> PRODUCER;
 
     static {
-        Map composeFile = null;
         try {
-            composeFile = (Map)new YamlReader(new FileReader(DOCKER_COMPOSE_FILE)).read();
+            Map composeFile = (Map)new YamlReader(new FileReader(DOCKER_COMPOSE_FILE)).read();
 
             KAFKA_BROKER = extractHostnameFromDockerCompose(composeFile,"kafkabroker");
             KAFKA_BROKER_PORT = extractHostPortFromDockerCompose(composeFile,"kafkabroker");
