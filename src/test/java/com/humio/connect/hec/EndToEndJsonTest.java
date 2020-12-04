@@ -331,7 +331,8 @@ public class EndToEndJsonTest {
         System.out.println("sending -> " + configuration);
         Response response = new OkHttpClient().newCall(request).execute();
         System.out.println("response code = " + response.code());
-        System.out.println("response body = " + response.body().string());
+        String responseBody = response.body() != null ? response.body().string() : null;
+        System.out.println("response body = " + responseBody);
 
         // if it already exists, let's update it as configuration may have changed between runs
         if (response.code() == 409) {
@@ -360,7 +361,7 @@ public class EndToEndJsonTest {
             response.close();
         } else {
             throw new RuntimeException("invalid response from kafka connect while registering connector: " +
-                    response.code() + ": " + response.body().string());
+                    response.code() + ": " + responseBody);
         }
     }
 
