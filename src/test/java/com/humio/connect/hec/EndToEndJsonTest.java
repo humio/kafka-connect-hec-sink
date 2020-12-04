@@ -8,7 +8,6 @@ package com.humio.connect.hec;
 
 import com.esotericsoftware.yamlbeans.YamlException;
 import com.esotericsoftware.yamlbeans.YamlReader;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -256,7 +255,7 @@ public class EndToEndJsonTest {
     private static List<JsonObject> queryHumio(String query) throws IOException {
         JsonObject q = new JsonObject();
         q.addProperty("queryString", query);
-        q.addProperty("start", "30s");
+        q.addProperty("start", "5m");
         q.addProperty("end", "now");
         q.addProperty("isLive", false);
         return queryHumio(q);
@@ -286,24 +285,36 @@ public class EndToEndJsonTest {
     }
 
     private static String getIngestToken() throws IOException {
-        System.out.println("extracting " + HUMIO_INDEX + " ingest key from global data snapshot...");
-        String s = new String(Files.readAllBytes(Paths.get("humio-data/global-data-snapshot.json")));
-        JsonObject data = new JsonParser().parse(s).getAsJsonObject();
-        JsonObject dataspaces = data.getAsJsonObject("dataspaces");
-        Set<Map.Entry<String, JsonElement>> entries = dataspaces.entrySet();
-        for(Map.Entry<String, JsonElement> entry : entries) {
-            String key = entry.getKey();
-            JsonObject obj = entry.getValue().getAsJsonObject();
-            if (key.startsWith(HUMIO_INDEX) && key.indexOf("LocalHostRoot") == -1) {
-                System.out.println("located " + HUMIO_INDEX + " key: " + key);
-                JsonObject sandbox = dataspaces.getAsJsonObject(key);
-                JsonObject entity = sandbox.getAsJsonObject("entity");
-                JsonArray tokens = entity.getAsJsonArray("ingestTokens");
-                JsonObject token = tokens.get(0).getAsJsonObject();
-                return token.get("token").getAsString();
+        System.out.println("getting " + HUMIO_INDEX + " ingest token via graphql...");
+
+        RequestBody body = RequestBody.create(
+                MediaType.parse("application/json"),
+                "{ \"query\": \"query { repositories { name ingestTokens { token } } }\"} "
+        );
+
+        Request request = new Request.Builder()
+                .url("http://localhost:"+HUMIO_PORT+"/graphql")
+                .post(body)
+                .build();
+
+        try (Response response = new OkHttpClient().newCall(request).execute()) {
+            String responseBody = Objects.requireNonNull(response.body()).string();
+            JsonObject data = new JsonParser().parse(responseBody).getAsJsonObject();
+
+            for (JsonElement element : data.getAsJsonObject("data").getAsJsonArray("repositories")) {
+                JsonObject obj = element.getAsJsonObject();
+                if (obj.get("name").getAsString().startsWith(HUMIO_INDEX)) {
+                    return obj
+                            .getAsJsonArray("ingestTokens")
+                            .get(0)
+                            .getAsJsonObject()
+                            .get("token")
+                            .getAsString();
+                }
             }
+
+            throw new RuntimeException("cannot extract " + HUMIO_INDEX + " ingest token via graphql");
         }
-        throw new RuntimeException("cannot extract " + HUMIO_INDEX + " key from humio-data/global-data-snapshot.json");
     }
 
     private static void registerHumioHECSinkConnector(String configuration) throws IOException {
@@ -319,7 +330,8 @@ public class EndToEndJsonTest {
         System.out.println("sending -> " + configuration);
         Response response = new OkHttpClient().newCall(request).execute();
         System.out.println("response code = " + response.code());
-        System.out.println("response body = " + response.body().string());
+        String responseBody = response.body() != null ? response.body().string() : null;
+        System.out.println("response body = " + responseBody);
 
         // if it already exists, let's update it as configuration may have changed between runs
         if (response.code() == 409) {
@@ -348,7 +360,7 @@ public class EndToEndJsonTest {
             response.close();
         } else {
             throw new RuntimeException("invalid response from kafka connect while registering connector: " +
-                    response.code() + ": " + response.body().string());
+                    response.code() + ": " + responseBody);
         }
     }
 
