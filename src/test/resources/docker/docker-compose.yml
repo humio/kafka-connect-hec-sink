@@ -64,7 +64,7 @@ services:
     ports:
       - "18083:18083"
     volumes:
-      - ../../../../target/kafka-connect-hec-sink-1.0-SNAPSHOT-jar-with-dependencies.jar:/etc/kafka-connect/jars/kafka-connect-hec-sink/kafka-connect-hec-sink-1.0-SNAPSHOT-jar-with-dependencies.jar
+      - ../../../../target/kafka-connect-hec-sink-1.1.1-SNAPSHOT-jar-with-dependencies.jar:/etc/kafka-connect/jars/kafka-connect-hec-sink/kafka-connect-hec-sink-1.0-SNAPSHOT-jar-with-dependencies.jar
     environment:
       CONNECT_BOOTSTRAP_SERVERS: 'kafkabroker:19092'
       CONNECT_REST_ADVERTISED_HOST_NAME: kafkaconnect
