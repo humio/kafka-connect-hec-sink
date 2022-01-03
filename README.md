@@ -4,10 +4,10 @@
 
 This guide provides step-by-step guidance on how to build, integrate and operate the Humio HEC connector within the Kafka platform.
 
-The purpose of the Humio HEC Sink connector is to read messages from a Kafka topic and submit them as events to the [HTTP event collector endpoint](https://docs.humio.com/integrations/data-shippers/hec/) of a running Humio system.
+The purpose of the Humio HEC Sink connector is to read messages from a Kafka topic and submit them as events to the [HTTP event collector endpoint](https://library.humio.com/stable/docs/ingesting-data/log-shippers/hec/) of a running Humio system.
 
 ## Governance
-This project is maintained by employees at Humio ApS.
+This project is maintained by employees at Humio Ltd.
 As a general rule, only employees at Humio can become maintainers and have commit privileges to this repository.
 Therefore, if you want to contribute to the project, which we very much encourage, you must first fork the repository.
 Maintainers will have the final say on accepting or rejecting pull requests.
@@ -22,15 +22,11 @@ If you haven't heard back from a maintainer within 7 days of creating an issue o
 
 Maintainers will also be in charge of both versioning and publishing future releases of the project. This includes adding versioning tags and adding to the changelog file.
  
-The active maintainers involved with this project include:
-  
-   * [John Muellerleile](https://github.com/jrecursive/)
-
 ## Resources
 
 * [HEC Sink Connector GitHub Repository](https://github.com/humio/kafka-connect-hec-sink)
 * [Confluent Kafka Connect Documentation](https://docs.confluent.io/current/connect/index.html)
-* [Humio HEC Endpoint Documentation](https://docs.humio.com/integrations/data-shippers/hec/)
+* [Humio HEC Endpoint Documentation](https://library.humio.com/stable/docs/ingesting-data/log-shippers/hec/)
 
 ## Installation
 
@@ -157,7 +153,7 @@ Name | Description
 
 ## HEC Event Field Support & Techniques
 
-The Humio HEC endpoint supports several more fields which are not explicitly handled by this connector.  The techniques outlined below for each field may give you some ideas on how to use these fields by way of Kafka Connector's [Single Message Transformations](https://docs.confluent.io/current/connect/transforms/index.html).  Alternatively, these fields may also be set (or modified) by way of Humio's [Parsers](https://docs.humio.com/parsers/).
+The Humio HEC endpoint supports several more fields which are not explicitly handled by this connector.  The techniques outlined below for each field may give you some ideas on how to use these fields by way of Kafka Connector's [Single Message Transformations](https://docs.confluent.io/current/connect/transforms/index.html).  Alternatively, these fields may also be set (or modified) by way of Humio's [Parsers](https://library.humio.com/stable/docs/parsers/).
 
 ### SMT rename example: `time`
 

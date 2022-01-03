@@ -10,19 +10,6 @@
     <name>kafka-connect-hec-sink</name>
     <description>A Kafka Connect sink for HEC</description>
 
-    <developers>
-        <developer>
-            <name>John Muellerleile</name>
-            <email>john@humio.com</email>
-            <url>https://github.com/humio/kafka-connect-hec-sink</url>
-            <roles>
-                <role>maintainer</role>
-            </roles>
-        </developer>
-    </developers>
-
-
-
     <properties>
         <kafka.version>2.2.0</kafka.version>
         <metrics.version>4.2.4</metrics.version>
