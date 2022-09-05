@@ -55,7 +55,7 @@ services:
       SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: 'zookeeper:12181'
 
   kafkaconnect:
-    image: confluentinc/cp-kafka-connect:5.2.0
+    image: confluentinc/cp-kafka-connect:5.4.9
     hostname: kafkaconnect
     depends_on:
       - zookeeper
