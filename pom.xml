@@ -4,14 +4,14 @@
 
     <groupId>com.humio.kafka.connect.hec</groupId>
     <artifactId>kafka-connect-hec-sink</artifactId>
-    <version>1.1.4</version>
+    <version>1.1.5</version>
     <packaging>jar</packaging>
 
     <name>kafka-connect-hec-sink</name>
     <description>A Kafka Connect sink for HEC</description>
 
     <properties>
-        <kafka.version>2.2.0</kafka.version>
+        <kafka.version>3.1.1</kafka.version>
         <metrics.version>4.2.4</metrics.version>
         <junit.jupiter.version>5.8.2</junit.jupiter.version>
         <junit.vintage.version>5.8.2</junit.vintage.version>
@@ -28,7 +28,7 @@
         <nexus.staging.maven.plugin.version>1.6.8</nexus.staging.maven.plugin.version>
         <mvn.failsafe.plugin.version>2.22.1</mvn.failsafe.plugin.version>
         <jackson.version>2.13.0</jackson.version>
-        <confluent.interceptors.version>5.2.1</confluent.interceptors.version>
+        <confluent.interceptors.version>7.2.1</confluent.interceptors.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -193,6 +193,16 @@
             <artifactId>avro-maven-plugin</artifactId>
             <version>${avro.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-utils</artifactId>
+            <version>3.4.2</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.15</version>
         </dependency>
     </dependencies>
 

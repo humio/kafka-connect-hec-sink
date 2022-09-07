@@ -35,10 +35,10 @@ Maintainers will also be in charge of both versioning and publishing future rele
 The Humio HEC connector uses maven to build and test itself.  The version of Kafka to build for is indicated in the `pom.xml` file by the line:
 
 ```
-<kafka.version>2.2.0</kafka.version>
+<kafka.version>3.1.1</kafka.version>
 ```
 
-Out of the box, Kafka 2.2.0 is supported.  This can (and should) be changed to match your current Kafka or Confluent Platform version; to check which version this is, refer to the [Confluent Platform Versions](https://docs.confluent.io/current/installation/versions-interoperability.html) page.
+Out of the box, Kafka 3.1.1 is supported.  This can (and should) be changed to match your current Kafka or Confluent Platform version; to check which version this is, refer to the [Confluent Platform Versions](https://docs.confluent.io/current/installation/versions-interoperability.html) page.
 
 Scripts are provided to automatically build and package the connector jar.  `bin/compile.sh` automatically compiles and packages the connector, with the resulting "uber jar" located at `target/kafka-connect-hec-sink-1.0-SNAPSHOT-jar-with-dependencies.jar`.  Alternatively, you can run:
 

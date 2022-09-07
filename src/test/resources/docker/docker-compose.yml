@@ -55,7 +55,7 @@ services:
       SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: 'zookeeper:12181'
 
   kafkaconnect:
-    image: confluentinc/cp-kafka-connect:5.2.0
+    image: confluentinc/cp-kafka-connect:5.4.9
     hostname: kafkaconnect
     depends_on:
       - zookeeper
@@ -64,7 +64,7 @@ services:
     ports:
       - "18083:18083"
     volumes:
-      - ../../../../target/kafka-connect-hec-sink-1.1.4-jar-with-dependencies.jar:/etc/kafka-connect/jars/kafka-connect-hec-sink/kafka-connect-hec-sink-1.0-SNAPSHOT-jar-with-dependencies.jar
+      - ../../../../target/kafka-connect-hec-sink-1.1.5-jar-with-dependencies.jar:/etc/kafka-connect/jars/kafka-connect-hec-sink/kafka-connect-hec-sink-1.0-SNAPSHOT-jar-with-dependencies.jar
     environment:
       CONNECT_BOOTSTRAP_SERVERS: 'kafkabroker:19092'
       CONNECT_REST_ADVERTISED_HOST_NAME: kafkaconnect
