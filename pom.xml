@@ -11,7 +11,7 @@
     <description>A Kafka Connect sink for HEC</description>
 
     <properties>
-        <kafka.version>3.1.1</kafka.version>
+        <kafka.version>3.1.2</kafka.version>
         <metrics.version>4.2.4</metrics.version>
         <junit.jupiter.version>5.8.2</junit.jupiter.version>
         <junit.vintage.version>5.8.2</junit.vintage.version>
