@@ -22,7 +22,7 @@
         <codacy.plugin.version>1.1.0</codacy.plugin.version>
         <yaml.beans.version>1.15</yaml.beans.version>
         <testcontainers.version>1.16.2</testcontainers.version>
-        <avro.version>1.11.0</avro.version>
+        <avro.version>1.11.3</avro.version>
         <confluent.serializer.version>5.2.0</confluent.serializer.version>
         <confluent.connect.plugin.version>0.12.0</confluent.connect.plugin.version>
         <nexus.staging.maven.plugin.version>1.6.8</nexus.staging.maven.plugin.version>
